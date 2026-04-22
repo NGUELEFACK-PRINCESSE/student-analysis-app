@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Analyse intelligente des performance des étudiants</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root {
+    --bg: #f4f8fb;
+    --card: white;
+    --text: black;
+}
+
+body.dark {
+    --bg: #121212;
+    --card: #1e1e1e;
+    --text: white;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--bg);
+    margin:0;
+    transition:0.3s;
+    color: var(--text);
+}
+
+header {
+    background: linear-gradient(135deg,#007BFF,#00c6ff);
+    color:white;
+    padding:25px;
+    text-align:center;
+    font-size:26px;
+    position:relative;
+}
+
+.toggle {
+    position:absolute;
+    right:20px;
+    top:20px;
+    cursor:pointer;
+    font-size:18px;
+}
+
+.container {
+    width:90%;
+    margin:auto;
+}
+
+.card {
+    background: var(--card);
+    padding:20px;
+    margin-top:20px;
+    border-radius:15px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.1);
+    animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+    from {opacity:0; transform:translateY(20px);}
+    to {opacity:1;}
+}
+
+h2 {
+    color:#007BFF;
+}
+
+input, select {
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border-radius:8px;
+}
+
+button {
+    width:100%;
+    padding:12px;
+    background:linear-gradient(135deg,#007BFF,#00c6ff);
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover {
+    transform:scale(1.05);
+}
+
+table {
+    width:100%;
+    border-collapse:collapse;
+}
+
+th, td {
+    padding:10px;
+    text-align:center;
+}
+
+th {
+    background:#007BFF;
+    color:white;
+}
+
+tr:nth-child(even) {
+    background:rgba(0,0,0,0.05);
+}
+
+.stats-grid {
+    display:grid;
+    grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+    gap:15px;
+}
+
+.stat {
+    background:#007BFF;
+    color:white;
+    padding:15px;
+    border-radius:10px;
+    text-align:center;
+}
+
+.stat span {
+    font-size:22px;
+    display:block;
+    font-weight:bold;
+}
+
+canvas {
+    margin-top:20px;
+    background:var(--card);
+    padding:10px;
+    border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+📊 Analyse intelligente des perfpormances des étudiants
+<span class="toggle" onclick="toggleMode()">🌙</span>
+</header>
+
+<div class="container">
+
+<div class="card">
+<h2>➕ Ajouter étudiant</h2>
+<form method="POST">
+<input name="nom" placeholder="👤 Nom" required>
+<input name="filiere" placeholder="🎓 Filière" required>
+<input name="heures" type="number" placeholder="⏱ Heures" required>
+<input name="moyenne" type="number" placeholder="📊 Moyenne" required>
+<button>Ajouter</button>
+</form>
+</div>
+
+<div class="card">
+<h2>🔎 Filtrer</h2>
+<form method="GET">
+<input name="search" placeholder="Nom...">
+<select name="filiere">
+<option value="">Toutes filières</option>
+{% for f in filieres %}
+<option value="{{f}}">{{f}}</option>
+{% endfor %}
+</select>
+<button>Filtrer</button>
+</form>
+</div>
+
+<div class="card">
+<h2>📋 Liste</h2>
+<table>
+<tr><th>Nom</th><th>Filière</th><th>Heures</th><th>Moyenne</th></tr>
+{% for e in etudiants %}
+<tr>
+<td>{{e.nom}}</td>
+<td>{{e.filiere}}</td>
+<td>{{e.heures}}</td>
+<td>{{e.moyenne}}</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+
+<div class="card">
+<h2>📊 Statistiques</h2>
+
+<div class="stats-grid">
+<div class="stat">Moyenne<span>{{moyenne}}</span></div>
+<div class="stat">Corrélation<span>{{r}}</span></div>
+<div class="stat">Régression<span>{{a}}x + {{b}}</span></div>
+</div>
+
+{% if meilleur %}
+<p>🏆 {{meilleur.nom}}</p>
+<p>📉 {{pire.nom}}</p>
+{% endif %}
+</div>
+
+<div class="card">
+<h2>💡 Conseils</h2>
+<ul>
+{% for c in conseils %}
+<li>{{c}}</li>
+{% endfor %}
+</ul>
+</div>
+
+<div class="card">
+<h2>📈 Graphiques</h2>
+<canvas id="scatter"></canvas>
+<canvas id="histogram"></canvas>
+<canvas id="evolution"></canvas>
+</div>
+
+<script>
+function toggleMode(){
+    document.body.classList.toggle("dark");
+}
+
+const heures = {{heures|tojson}};
+const moyennes = {{moyennes|tojson}};
+const noms = {{noms|tojson}};
+const a={{a}}, b={{b}};
+
+new Chart(document.getElementById('scatter'),{
+type:'scatter',
+data:{datasets:[
+{label:'Étudiants',data:heures.map((x,i)=>({x:x,y:moyennes[i]}))},
+{label:'Régression',data:heures.map(x=>({x:x,y:a*x+b})),type:'line'}
+]}
+});
+
+new Chart(document.getElementById('histogram'),{
+type:'bar',
+data:{labels:noms,datasets:[{label:'Moyennes',data:moyennes}]}
+});
+
+new Chart(document.getElementById('evolution'),{
+type:'line',
+data:{labels:noms,datasets:[{label:'Évolution',data:moyennes}]}
+});
+</script>
+
+</div>
+
+</body>
+</html>
