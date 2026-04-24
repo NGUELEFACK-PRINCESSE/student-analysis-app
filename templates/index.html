@@ -1,94 +1,105 @@
 <!DOCTYPE html>
+
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Analyse intelligente des performance des étudiants</title>
+<title>Student Performance Analytics</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-:root {
-    --bg: #f4f8fb;
-    --card: white;
-    --text: black;
-}
-
-body.dark {
-    --bg: #121212;
-    --card: #1e1e1e;
-    --text: white;
-}
-
 body {
-    font-family: 'Segoe UI', sans-serif;
-    background: var(--bg);
+    font-family: 'Segoe UI';
     margin:0;
-    transition:0.3s;
-    color: var(--text);
+    background: linear-gradient(135deg,#eef2f7,#e0f2fe);
 }
 
+/* HEADER */
 header {
-    background: linear-gradient(135deg,#007BFF,#00c6ff);
+    background: linear-gradient(135deg,#1e3a8a,#2563eb);
     color:white;
     padding:25px;
     text-align:center;
-    font-size:26px;
-    position:relative;
 }
 
-.toggle {
-    position:absolute;
-    right:20px;
-    top:20px;
+header h1 { margin:0; }
+
+header p { margin-top:5px; opacity:0.9; }
+
+/* NAV */
+nav {
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    background:white;
+    padding:12px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+
+nav button {
+    background:#1e3a8a;
+    color:white;
+    border:none;
+    padding:10px 18px;
+    border-radius:8px;
     cursor:pointer;
-    font-size:18px;
+    transition:0.3s;
 }
 
+nav button:hover {
+    background:#2563eb;
+    transform:scale(1.05);
+}
+
+/* CONTAINER */
 .container {
     width:90%;
     margin:auto;
 }
 
+/* SECTIONS */
+.section { display:none; }
+.active { display:block; }
+
+/* CARD */
 .card {
-    background: var(--card);
+    background:white;
     padding:20px;
     margin-top:20px;
     border-radius:15px;
-    box-shadow:0 5px 20px rgba(0,0,0,0.1);
-    animation: fadeIn 0.6s ease;
+    box-shadow:0 10px 25px rgba(0,0,0,0.1);
+    transition:0.3s;
 }
 
-@keyframes fadeIn {
-    from {opacity:0; transform:translateY(20px);}
-    to {opacity:1;}
+.card:hover {
+    transform:translateY(-5px);
 }
 
-h2 {
-    color:#007BFF;
-}
-
+/* INPUT */
 input, select {
     width:100%;
     padding:10px;
     margin:8px 0;
     border-radius:8px;
+    border:1px solid #ccc;
 }
 
-button {
+/* BUTTON */
+button.submit {
     width:100%;
     padding:12px;
-    background:linear-gradient(135deg,#007BFF,#00c6ff);
+    background:linear-gradient(135deg,#2563eb,#3b82f6);
     color:white;
     border:none;
-    border-radius:10px;
-    cursor:pointer;
-    transition:0.2s;
+    border-radius:8px;
+    transition:0.3s;
 }
 
-button:hover {
+button.submit:hover {
     transform:scale(1.05);
 }
 
+/* TABLE */
 table {
     width:100%;
     border-collapse:collapse;
@@ -100,82 +111,115 @@ th, td {
 }
 
 th {
-    background:#007BFF;
+    background:#1e3a8a;
     color:white;
 }
 
-tr:nth-child(even) {
-    background:rgba(0,0,0,0.05);
+tr:hover {
+    background:#e0f2fe;
 }
 
-.stats-grid {
+/* STATS */
+.stats {
     display:grid;
-    grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
     gap:15px;
 }
 
-.stat {
-    background:#007BFF;
+.stat-box {
+    background: linear-gradient(135deg,#2563eb,#3b82f6);
     color:white;
     padding:15px;
     border-radius:10px;
     text-align:center;
-}
-
-.stat span {
-    font-size:22px;
-    display:block;
     font-weight:bold;
 }
 
+/* CONSEILS */
+.conseil {
+    background:#ecfeff;
+    padding:12px;
+    border-left:5px solid #06b6d4;
+    margin:10px 0;
+    border-radius:8px;
+}
+
+/* CHART */
 canvas {
     margin-top:20px;
-    background:var(--card);
+    background:white;
     padding:10px;
     border-radius:10px;
 }
 </style>
+
 </head>
 
 <body>
 
 <header>
-📊 Système d'analyse intelligente des performances des étudiant selon leurs heures d'etude 
-<span class="toggle" onclick="toggleMode()">🌙</span>
+<h1>📊 Student Performance Analytics</h1>
+<p>Analyze, visualize and improve student performance based on study habits</p>
 </header>
+
+<nav>
+<button onclick="show('home')">Dashboard</button>
+<button onclick="show('add')">Add</button>
+<button onclick="show('list')">Students</button>
+<button onclick="show('stats')">Insights</button>
+</nav>
 
 <div class="container">
 
+<!-- HOME -->
+
+<div id="home" class="section active">
 <div class="card">
-<h2>➕ Ajouter étudiant</h2>
-<form method="POST">
-<input name="nom" placeholder="👤 Nom" required>
-<input name="filiere" placeholder="🎓 Filière" required>
-<input name="heures" type="number" placeholder="⏱ Heures" required>
-<input name="moyenne" type="number" placeholder="📊 Moyenne" required>
-<button>Ajouter</button>
-</form>
+<h2>📊 Overview</h2>
+<p>This system helps you understand how study time influences student success and provides smart recommendations.</p>
+</div>
 </div>
 
+<!-- ADD -->
+
+<div id="add" class="section">
 <div class="card">
-<h2>🔎 Filtrer</h2>
+<h2>➕ Add Student Data</h2>
+
+<form method="POST">
+<input name="nom" placeholder="Student name" required>
+<input name="filiere" placeholder="Field of study" required>
+<input name="heures" type="number" placeholder="Study hours" required>
+<input name="moyenne" type="number" placeholder="Average score" required>
+<button class="submit">Add Student</button>
+</form>
+
+</div>
+</div>
+
+<!-- LIST -->
+
+<div id="list" class="section">
+<div class="card">
+
+<h2>📋 Student Database</h2>
+
 <form method="GET">
-<input name="search" placeholder="Nom...">
+<input name="search" placeholder="Search student...">
 <select name="filiere">
-<option value="">Toutes filières</option>
+<option value="">All fields</option>
 {% for f in filieres %}
 <option value="{{f}}">{{f}}</option>
 {% endfor %}
 </select>
-<button>Filtrer</button>
+<button class="submit">Filter</button>
 </form>
-</div>
 
-<div class="card">
-<h2>📋 Liste</h2>
 <table>
-<tr><th>Nom</th><th>Filière</th><th>Heures</th><th>Moyenne</th></tr>
+<tr><th>Name</th><th>Field</th><th>Hours</th><th>Score</th></tr>
+
 {% for e in etudiants %}
+
 <tr>
 <td>{{e.nom}}</td>
 <td>{{e.filiere}}</td>
@@ -183,43 +227,51 @@ canvas {
 <td>{{e.moyenne}}</td>
 </tr>
 {% endfor %}
+
 </table>
+
+</div>
 </div>
 
-<div class="card">
-<h2>📊 Statistiques</h2>
+<!-- STATS -->
 
-<div class="stats-grid">
-<div class="stat">Moyenne<span>{{moyenne}}</span></div>
-<div class="stat">Corrélation<span>{{r}}</span></div>
-<div class="stat">Régression<span>{{a}}x + {{b}}</span></div>
+<div id="stats" class="section">
+<div class="card">
+
+<h2>📊 Performance Insights</h2>
+
+<div class="stats">
+<div class="stat-box">Average<br>{{moyenne}}</div>
+<div class="stat-box">Correlation<br>{{r}}</div>
+<div class="stat-box">Regression<br>{{a}}x + {{b}}</div>
 </div>
 
 {% if meilleur %}
-<p>🏆 {{meilleur.nom}}</p>
-<p>📉 {{pire.nom}}</p>
+
+<p>🏆 Best: {{meilleur.nom}}</p>
+<p>⚠️ Needs Improvement: {{pire.nom}}</p>
 {% endif %}
-</div>
 
-<div class="card">
-<h2>💡 Conseils</h2>
-<ul>
+<h3>💡 Smart Recommendations</h3>
+
 {% for c in conseils %}
-<li>{{c}}</li>
+
+<div class="conseil">{{c}}</div>
 {% endfor %}
-</ul>
+
+<h3>📈 Data Visualization</h3>
+
+<canvas id="scatter"></canvas> <canvas id="histogram"></canvas> <canvas id="evolution"></canvas>
+
+</div>
 </div>
 
-<div class="card">
-<h2>📈 Graphiques</h2>
-<canvas id="scatter"></canvas>
-<canvas id="histogram"></canvas>
-<canvas id="evolution"></canvas>
 </div>
 
 <script>
-function toggleMode(){
-    document.body.classList.toggle("dark");
+function show(id){
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
 }
 
 const heures = {{heures|tojson}};
@@ -227,26 +279,30 @@ const moyennes = {{moyennes|tojson}};
 const noms = {{noms|tojson}};
 const a={{a}}, b={{b}};
 
+// SCATTER
 new Chart(document.getElementById('scatter'),{
 type:'scatter',
-data:{datasets:[
-{label:'Étudiants',data:heures.map((x,i)=>({x:x,y:moyennes[i]}))},
-{label:'Régression',data:heures.map(x=>({x:x,y:a*x+b})),type:'line'}
-]}
+data:{
+datasets:[
+{label:'Students',data:heures.map((x,i)=>({x:x,y:moyennes[i]}))},
+{label:'Regression',data:heures.map(x=>({x:x,y:a*x+b})),type:'line'}
+]
+}
 });
 
+// HISTOGRAM
 new Chart(document.getElementById('histogram'),{
 type:'bar',
-data:{labels:noms,datasets:[{label:'Moyennes',data:moyennes}]}
+data:{labels:noms,datasets:[{label:'Scores',data:moyennes}]}
 });
 
+// EVOLUTION
 new Chart(document.getElementById('evolution'),{
 type:'line',
-data:{labels:noms,datasets:[{label:'Évolution',data:moyennes}]}
+data:{labels:noms,datasets:[{label:'Trend',data:moyennes}]}
 });
 </script>
 
-</div>
-
 </body>
 </html>
+
